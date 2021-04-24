@@ -1,8 +1,11 @@
 import "./App.css";
 import ReactPlayer from "react-player";
-import { useState } from "react";
+import socketIOClient from "socket.io-client";
+import { useEffect, useState } from "react";
 
 function App() {
+  const socketUrl = "http://127.0.0.1:4000";
+  const [socketData, setSocketData] = useState(null);
   const [selectedTab, setSelectedTab] = useState(true);
   const [playing, setPlaying] = useState(false);
   const videoUrl = "https://www.youtube.com/watch?v=sBws8MSXN7A";
@@ -11,6 +14,15 @@ function App() {
     setSelectedTab(flag);
     setPlaying(flag);
   }
+
+  useEffect(() => {
+    const socket = socketIOClient.connect(socketUrl, {
+      withCredentials: true,
+    });
+    socket.on("message", (data) => {
+      setSocketData(data);
+    });
+  }, []);
 
   return (
     <div className="App">
@@ -29,6 +41,7 @@ function App() {
       ) : (
         <div className="tabcontent">
           <h1>Tab2 content</h1>
+          {socketData ? <h2>{socketData}</h2> : null}
         </div>
       )}
     </div>
